@@ -12,4 +12,8 @@ describe Oystercard do
     subject.top_up(90)
     expect { subject.top_up(1) }.to raise_error 'Limit is 90'
   end
+  it 'deducts money' do
+    subject.deduct(10)
+    expect(subject.balance).to eq -10
+  end
 end
