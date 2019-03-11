@@ -16,4 +16,13 @@ describe Oystercard do
     subject.deduct(10)
     expect(subject.balance).to eq -10
   end
+  it 'allows me to touch in' do
+    subject.touch_in
+    expect(subject).to be_in_journey
+  end
+  it 'allows me to touch out' do
+    subject.touch_in
+    subject.touch_out
+    expect(subject).not_to be_in_journey
+  end
 end
