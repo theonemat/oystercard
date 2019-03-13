@@ -3,7 +3,8 @@
 require 'oystercard'
 
 describe Oystercard do
-  let(:station){ double :station }
+  let(:entry_station){ double :entry_station }
+  let(:exit_station){ double :exit_station }
 
   it 'checks money on card' do
     expect(subject.balance).to eq 0
@@ -22,33 +23,48 @@ describe Oystercard do
   end
   it 'allows me to touch in' do
     subject.top_up(10)
-    subject.touch_in(station)
+    subject.touch_in(entry_station)
     expect(subject).to be_in_journey
   end
   it 'allows me to touch out' do
     subject.top_up(10)
-    subject.touch_in(station)
-    subject.touch_out
+    subject.touch_in(entry_station)
+    subject.touch_out(exit_station)
     expect(subject).not_to be_in_journey
   end
-  it 'raises an error if i touch in with balance less than 1' do
+  it "raises an error if i touch in with balance less than #{:MINIMUM}" do
     subject.top_up(0.99)
-    expect { subject.touch_in(station) }.to raise_error 'Insufficient balance'
+    expect { subject.touch_in(entry_station) }.to raise_error 'Insufficient balance'
   end
   it 'deducts minimum fare on touch out' do
     subject.top_up(10)
-    subject.touch_in(station)
-    expect { subject.touch_out }.to change { subject.balance }.by(-Oystercard::MINIMUM)
+    subject.touch_in(entry_station)
+    expect { subject.touch_out(exit_station) }.to change { subject.balance }.by(-Oystercard::MINIMUM)
   end
   it 'remembers station at touch_in' do
     subject.top_up(10)
-    subject.touch_in(station)
-    expect(subject.entry_station).to eq station
+    subject.touch_in(entry_station)
+    expect(subject.entry_station).to eq entry_station
   end
   it 'removes entery station' do
   subject.top_up(10)
-  subject.touch_in(station)
-  subject.touch_out
+  subject.touch_in(entry_station)
+  subject.touch_out(exit_station)
   expect(subject.entry_station).to eq nil
   end
+  it 'puts exist_Station' do
+  subject.top_up(10)
+  subject.touch_in(entry_station)
+  subject.touch_out(exit_station)
+  expect(subject.exit_station).to eq exit_station
+  end
+
+  let(:journey) {{entry_station: entry_station , exit_station: exit_station }}
+  it 'puts stations into array' do
+  subject.top_up(10)
+  subject.touch_in(entry_station)
+  subject.touch_out(exit_station)
+  expect(subject.journey_list).to include journey
+  end
+
 end
